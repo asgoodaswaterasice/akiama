@@ -1,0 +1,1 @@
+add_executable(unittest_thread unittest_thread.cc)

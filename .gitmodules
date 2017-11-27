@@ -1,0 +1,3 @@
+[submodule "src/rpc/grpc"]
+	path = src/rpc/grpc
+	url = https://github.com/grpc/grpc.git

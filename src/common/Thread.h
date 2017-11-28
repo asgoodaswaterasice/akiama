@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include <sys/types.h>
+#include <mutex>
 
 namespace akiama {
 namespace common {

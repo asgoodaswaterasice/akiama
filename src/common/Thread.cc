@@ -1,6 +1,9 @@
 #include "Thread.h"
 #include "page.h"
+#include "io_priority.h"
+#include <assert.h>
 #include <sched.h>
+#include <signal.h>
 
 namespace akiama {
 namespace common {

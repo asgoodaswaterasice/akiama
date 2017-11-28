@@ -26,7 +26,7 @@ extern pid_t akiama_gettid();
 # define IOPRIO_CLASS_IDLE 3
 #endif
 
-extern int ioprio_set(int whence, int who, int ioprio);
+extern int akiama_ioprio_set(int whence, int who, int ioprio);
 
 extern int ioprio_string_to_class(const std::string& s);
 

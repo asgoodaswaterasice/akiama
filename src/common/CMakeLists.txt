@@ -3,6 +3,9 @@ set(common_files
     page.cc
     io_priority.cc)
 
-set(common_objs OBJECT ${common_files})
+add_library(common_objs OBJECT ${common_files})
 
-add_library(common STATIC ${common_objs})
+set(akiama_common_objs 
+	$<TARGET_OBJECTS:common_objs>)
+
+add_library(common STATIC ${akiama_common_objs})

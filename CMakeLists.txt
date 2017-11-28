@@ -6,4 +6,6 @@ set(Akiama_VERSION_MINOR 1)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
+option(WITH_TESTS "enable the build of test" ON)
+
 add_subdirectory(src)

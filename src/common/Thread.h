@@ -1,5 +1,5 @@
-#ifndef AKIAMA_COMMON_THREAD_H
-#define AKIAMA_COMMON_THREAD_H
+#ifndef AKIAMA_COMMON_THREAD_H_
+#define AKIAMA_COMMON_THREAD_H_
 
 #include <pthread.h>
 #include <sys/types.h>
@@ -10,6 +10,10 @@ namespace common {
 
 class Thread {
 public:
+	Thread();
+	Thread(const Thread & t) = delete;
+	Thread &operator=(const Thread &t) = delete;
+	virtual ~Thread();
     const pthread_t &thread_id() const;
     pid_t pid() const;
     bool is_started() const;
@@ -36,7 +40,7 @@ private:
     pid_t m_pid;
     int m_cpuid;
     int m_ioprio_class, m_ioprio_priority;
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     const char *m_thread_name;
 };
 

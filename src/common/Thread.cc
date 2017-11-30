@@ -8,11 +8,21 @@
 namespace akiama {
 namespace common {
 
+Thread::Thread() : m_thread_id(0),
+	m_pid(0), m_cpuid(0),
+	m_ioprio_class(0), m_ioprio_priority(0),
+    m_thread_name("") {
+}
+
+Thread::~Thread() {
+}
+
 const pthread_t & Thread::thread_id() const {
     return m_thread_id;
 }
 
 pid_t Thread::pid() const {
+    std::lock_guard<std::mutex> lock(m_lock);
     return m_pid;
 }
 
@@ -75,7 +85,7 @@ int Thread::try_create(size_t stacksize) {
 void Thread::create(const char *name, size_t stacksize) {
     m_thread_name = name;
     int ret = try_create(stacksize);
-    assert(ret != 0);
+    assert(ret == 0);
 }
 
 int Thread::set_ioprio(int cls, int prio) {

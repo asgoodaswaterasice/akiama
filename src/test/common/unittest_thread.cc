@@ -18,13 +18,17 @@ private:
 };
 
 TEST(thread_test, normal) {
-    thread = TestThread();
+    TestThread thread;
     thread.create("test_thread");
-    thread.join();
+
+	sleep(10);
+	EXPECT_TRUE(0 == thread.cancel());
+
+	EXPECT_TRUE(0 == thread.join());
 }
 
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TEST();
+    return RUN_ALL_TESTS();
 }

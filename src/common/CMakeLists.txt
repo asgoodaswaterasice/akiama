@@ -9,3 +9,4 @@ set(akiama_common_objs
 	$<TARGET_OBJECTS:common_objs>)
 
 add_library(common STATIC ${akiama_common_objs})
+target_link_libraries(common pthread)

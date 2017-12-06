@@ -1,5 +1,6 @@
 #include "Thread.h"
 #include <vector>
+#include <list>
 #include <condition_variable>
 #include <iostream>
 #include <atomic>
@@ -13,18 +14,24 @@ class WorkQueue {
 public:
 	void enqueue(int64_t job) {
 		std::unique_lock<std::mutex> lock(m_mutex);
-		if (m_jobs.size() < BUFFER_JOB_MAX_NUM) {
+		// if (m_jobs.size() < BUFFER_JOB_MAX_NUM) {
+		if (m_job_count < BUFFER_JOB_MAX_NUM) {
 			m_jobs.push_back(job);
-			m_consumer_cond.notify_one();
+			m_job_count++;
+			if (m_job_count > 1000) {
+				m_consumer_cond.notify_one();
+			}
 		} else {
 			m_producer_cond.wait(lock);
 		}
 	}
 	bool dequeue(int64_t &job) {
 		std::unique_lock<std::mutex> lock(m_mutex);
-		if (m_jobs.size()) {
-			job = m_jobs.back();
+		// if (m_jobs.size()) {
+		if (m_job_count) {
+			job = *m_jobs.end();
 			m_jobs.pop_back();
+			m_job_count--;
 			m_producer_cond.notify_one();
 			return true;
 		} else {
@@ -33,7 +40,8 @@ public:
 		}
 	}
 private:
-	std::vector<int64_t> m_jobs;
+	std::list<int64_t> m_jobs;
+	int64_t m_job_count = 0;
 	const int BUFFER_JOB_MAX_NUM = (1 << 20);
 	mutable std::condition_variable m_producer_cond;
 	mutable std::condition_variable m_consumer_cond;

@@ -1,7 +1,8 @@
 set(common_files
     Thread.cc
     page.cc
-    io_priority.cc)
+    io_priority.cc
+	buffer.cc)
 
 add_library(common_objs OBJECT ${common_files})
 

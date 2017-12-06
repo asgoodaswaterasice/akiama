@@ -2,6 +2,7 @@
 #define AKIAMA_COMMON_BUFFER_H_
 
 #include <memory>
+#include <vector>
 #include "RefCountObj.h"
 #include "page.h"
 
@@ -67,6 +68,7 @@ public:
 
 class BufferPtr {
 public:
+	BufferPtr();
 	explicit BufferPtr(BufferRaw *r);
 
 	explicit BufferPtr(size_t len);
@@ -96,12 +98,15 @@ private:
 
 class BufferList {
 public:
-	typedef std::list<BufferPtr> list;
-	typedef std::list<BufferPtr>::iterator iterator;
-	typedef std::list<BufferPtr>::const_iterator const_iterator;
+	typedef std::vector<BufferPtr> list;
+	typedef std::vector<BufferPtr>::iterator iterator;
+	typedef std::vector<BufferPtr>::const_iterator const_iterator;
 
 	BufferList();
 	explicit BufferList(BufferPtr p);
+	BufferList(const BufferList &l);
+	BufferList& operator=(const BufferList &l);
+
 	void append(const char *ptr, size_t len);
 	void append(const std::string &s);
 	void append(const BufferPtr &p);
@@ -111,7 +116,7 @@ public:
 		return m_buffers.begin();
 	}
 
-	const_interator begin() const {
+	const_iterator begin() const {
 		return m_buffers.begin();
 	}
 
@@ -122,9 +127,13 @@ public:
 	const_iterator end() const {
 		return m_buffers.end();
 	}
+
+	size_t buffer_count() const {
+		return m_buffers.size();
+	}
 private:
 	list m_buffers;
-	BUfferPtr m_append_buffer;
+	BufferPtr m_append_buffer;
 };
 
 }; // end of ns common

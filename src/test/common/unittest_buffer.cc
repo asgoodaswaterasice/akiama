@@ -30,6 +30,22 @@ TEST(BufferTest, BufferPtr) {
 	EXPECT_EQ(2, null_raw->count());
 }
 
+TEST(BufferTest, BufferList) {
+	BufferList null_list;
+	EXPECT_EQ(0, null_list.buffer_count());
+	EXPECT_EQ(null_list.begin(), null_list.end());
+
+	BufferPtr ptr(1024);
+	BufferList list_1, list_2(ptr);
+	list_1.append(ptr);
+
+	EXPECT_EQ(1, list_1.buffer_count());
+	EXPECT_EQ(1, list_2.buffer_count());
+
+	list_1.append(list_2);
+	EXPECT_EQ(2, list_1.buffer_count());
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

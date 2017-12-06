@@ -1,10 +1,14 @@
 #include "buffer.h"
+#include "inline_memory.h"
 
 namespace akiama {
 namespace common {
 
-BufferPtr::BufferPtr(BufferRaw *r) :
-	m_raw(r), m_off(0), m_len(r->len()) {
+BufferPtr::BufferPtr() : m_off(0), m_len(0), m_raw(nullptr) {
+}
+
+BufferPtr::BufferPtr(BufferRaw *r) : m_off(0),
+	m_len(r->len()), m_raw(r) {
 	r->get();
 }
 
@@ -73,6 +77,17 @@ BufferList::BufferList(BufferPtr p) {
 	m_buffers.push_back(p);
 }
 
+BufferList::BufferList(const BufferList &l) {
+	m_buffers = l.m_buffers;
+	m_append_buffer = l.m_append_buffer;
+}
+
+BufferList& BufferList::operator = (const BufferList& l) {
+	m_buffers = l.m_buffers;
+	m_append_buffer = l.m_append_buffer;
+	return *this;
+}
+
 void BufferList::append(const char *ptr, size_t len) {
 	// TODO
 }
@@ -82,10 +97,13 @@ void BufferList::append(const std::string &s) {
 }
 
 void BufferList::append(const BufferPtr &p) {
-	m_buffers.end(p);
+	m_buffers.push_back(p);
 }
 void BufferList::append(const BufferList &l) {
-	// TODO
+	const_iterator it = l.begin();
+	for (; it != l.end(); ++it) {
+		m_buffers.push_back(*it);
+	}
 }
 
 };

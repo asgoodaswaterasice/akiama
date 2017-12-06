@@ -1,6 +1,8 @@
 #ifndef AKIAMA_COMMON_INLINE_MEMORY_H_
 #define AKIAMA_COMMON_INLINE_MEMORY_H_
 
+#include <string.h>
+
 namespace akiama {
 namespace common {
 

@@ -12,6 +12,13 @@ BufferPtr::BufferPtr(BufferRaw *r) : m_off(0),
 	r->get();
 }
 
+BufferPtr::BufferPtr(BufferRaw *r, size_t off, size_t len) :
+	m_off(off), m_len(len), m_raw(r) {
+	assert(r);
+	assert((off + len) < r->len());
+	r->get();
+}
+
 BufferPtr::BufferPtr(size_t len) : m_off(0), m_len(len) {
 	m_raw = new BufferRaw(len);
 	m_raw->get();
@@ -37,21 +44,6 @@ BufferPtr& BufferPtr::operator = (const BufferPtr &b) {
 	return *this;
 }
 
-
-char *BufferPtr::data() {
-	if (m_raw) {
-		return m_raw->data() + m_off;
-	}
-	return NULL;
-}
-
-const char *BufferPtr::data() const {
-	if (m_raw) {
-		return m_raw->data() + m_off;
-	}
-	return NULL;
-}
-
 void BufferPtr::release() {
 	if (m_raw) {
 		m_raw->put();
@@ -70,19 +62,24 @@ size_t BufferPtr::append(const char *ptr, size_t len) {
 	return m_off + m_len;
 }
 
-BufferList::BufferList() {
+BufferList::BufferList() : m_len(0) {
 }
 
-BufferList::BufferList(BufferPtr p) {
-	m_buffers.push_back(p);
+BufferList::BufferList(const BufferPtr &p) {
+	if (p.len()) {
+		m_len = p.len();
+		m_buffers.push_back(p);
+	}
 }
 
 BufferList::BufferList(const BufferList &l) {
+	m_len = l.m_len;
 	m_buffers = l.m_buffers;
 	m_append_buffer = l.m_append_buffer;
 }
 
 BufferList& BufferList::operator = (const BufferList& l) {
+	m_len = l.m_len;
 	m_buffers = l.m_buffers;
 	m_append_buffer = l.m_append_buffer;
 	return *this;
@@ -97,12 +94,18 @@ void BufferList::append(const std::string &s) {
 }
 
 void BufferList::append(const BufferPtr &p) {
-	m_buffers.push_back(p);
+	if (p.len()) {
+		m_len += p.len();
+		m_buffers.push_back(p);
+	}
 }
 void BufferList::append(const BufferList &l) {
-	const_iterator it = l.begin();
-	for (; it != l.end(); ++it) {
-		m_buffers.push_back(*it);
+	if (l.len()) {
+		const_iterator it = l.begin();
+		for (; it != l.end(); ++it) {
+			m_buffers.push_back(*it);
+		}
+		m_len += l.len();
 	}
 }
 

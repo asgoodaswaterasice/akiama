@@ -11,9 +11,6 @@ namespace common {
 
 class BufferRaw : public RefCountObj {
 public:
-	BufferRaw() : m_data(nullptr), m_len(0) {
-	}
-
 	explicit BufferRaw(size_t len) {
 		m_data = new char[len];
 		m_len = len;
@@ -69,7 +66,10 @@ public:
 class BufferPtr {
 public:
 	BufferPtr();
+
 	explicit BufferPtr(BufferRaw *r);
+
+	BufferPtr(BufferRaw *r, size_t off, size_t len);
 
 	explicit BufferPtr(size_t len);
 
@@ -83,12 +83,48 @@ public:
 		release();
 	}
 
-	char *data();
+	char *data() {
+		if (m_raw) {
+			return m_raw->data() + m_off;
+		}
+		return nullptr;
+	}
 
-	const char *data() const;
+	const char *data() const {
+		if (m_raw) {
+			return m_raw->data() + m_off;
+		}
+		return nullptr;
+	}
 
 	void release();
 
+	size_t offset() const {
+		return m_off;
+	}
+
+	void set_offset(size_t off) {
+		assert(m_raw);
+		assert((off + m_len) < m_raw->len());
+		m_off = off;
+	}
+
+	size_t len() const {
+		return m_len;
+	}
+
+	void set_len(size_t len) {
+		assert(m_raw);
+		assert((m_off + len) < m_raw->len());
+		m_len = len;
+	}
+
+	size_t tail_unused_len() {
+		if (m_raw) {
+			return m_raw->len() - (m_off + m_len);
+		}
+		return 0;
+	}
 	size_t append(const char *ptr, size_t len);
 private:
 	size_t m_off;
@@ -103,7 +139,7 @@ public:
 	typedef std::vector<BufferPtr>::const_iterator const_iterator;
 
 	BufferList();
-	explicit BufferList(BufferPtr p);
+	explicit BufferList(const BufferPtr &p);
 	BufferList(const BufferList &l);
 	BufferList& operator=(const BufferList &l);
 
@@ -131,7 +167,11 @@ public:
 	size_t buffer_count() const {
 		return m_buffers.size();
 	}
+	uint64_t len() const {
+		return m_len;
+	}
 private:
+	uint64_t m_len;
 	list m_buffers;
 	BufferPtr m_append_buffer;
 };

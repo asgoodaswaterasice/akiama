@@ -5,10 +5,6 @@ using namespace akiama;
 using namespace common;
 
 TEST(BufferTest, BufferRaw) {
-	BufferRaw null_raw;
-
-	EXPECT_EQ(0, null_raw.len());
-
 	BufferRaw b_raw(1024);
 	EXPECT_EQ(1024, b_raw.len());
 
@@ -19,15 +15,35 @@ TEST(BufferTest, BufferRaw) {
 }
 
 TEST(BufferTest, BufferPtr) {
-	BufferRaw *null_raw(new BufferRaw);
-	BufferRaw *raw_1024(new BufferRaw(1024));
+	BufferRaw *raw_4(new BufferRaw(4));
 
-	EXPECT_EQ(0, null_raw->count());
-	BufferPtr ptr(null_raw);
-	EXPECT_EQ(1, null_raw->count());
+	BufferPtr ptr_0(raw_4);
+	EXPECT_EQ(1, raw_4->count());
 
-	BufferPtr ptr_1(null_raw);
-	EXPECT_EQ(2, null_raw->count());
+	{
+		BufferPtr ptr_1(raw_4);
+		EXPECT_EQ(2, raw_4->count());
+	}
+	EXPECT_EQ(1, raw_4->count());
+
+	char *data = new char[16];
+	strncpy(data, "0123456789abcdef", 16);
+	BufferRaw *raw_16(new BufferRaw(data, 16));
+
+	BufferPtr ptr_2(raw_16, 0, 10);
+	EXPECT_EQ(0, ptr_2.offset());
+	EXPECT_EQ(10, ptr_2.len());
+	EXPECT_EQ(16-10, ptr_2.tail_unused_len());
+	EXPECT_EQ(0, strncmp(ptr_2.data(), "0123456789", 10));
+	
+	ptr_2.set_len(4);
+	ptr_2.set_offset(4);
+	EXPECT_EQ(4, ptr_2.offset());
+	EXPECT_EQ(4, ptr_2.len());
+	EXPECT_EQ(8, ptr_2.tail_unused_len());
+	EXPECT_EQ(0, strncmp(ptr_2.data(), "4567", 4));
+
+	ptr_2.append("aaa", 3);
 }
 
 TEST(BufferTest, BufferList) {
